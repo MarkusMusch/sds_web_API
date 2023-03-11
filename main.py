@@ -13,14 +13,12 @@ Functions
 """
 
 import sqlite3
-from typing import List
 
 from fastapi import FastAPI
 import numpy as np
 from scipy.special import gamma
 
-from distributions import Distributions, ParameterTypes, Sample, \
-                          SampleStatistics
+from distributions import Distributions, ParameterTypes, Sample, SampleStatistics
 
 ID = 1
 
@@ -48,36 +46,33 @@ async def generate_sample_entry(sample: Sample):
 
     if sample.distribution_type is Distributions.uniform:
         if len(sample.params) != 2:
-            raise ValueError("Uniform distribution requires two parameters")
+            raise TypeError("Uniform distribution requires two parameters")
         if sample.params[0].param_type is not ParameterTypes.min:
-            raise ValueError("First parameter must be min")
+            raise TypeError("First parameter must be min")
         if sample.params[1].param_type is not ParameterTypes.max:
-            raise ValueError("Second parameter must be max")
+            raise TypeError("Second parameter must be max")
 
     elif sample.distribution_type is Distributions.normal:
         if len(sample.params) != 2:
-            raise ValueError("Normal distribution requires two parameters")
+            raise TypeError("Normal distribution requires two parameters")
         if sample.params[0].param_type is not ParameterTypes.mean:
-            raise ValueError("First parameter must be mean")
+            raise TypeError("First parameter must be mean")
         if sample.params[1].param_type is not ParameterTypes.std:
-            raise ValueError("Second parameter must be std")
+            raise TypeError("Second parameter must be std")
         if sample.params[1].param_val <= 0:
             raise ValueError("Standard deviation must be positive")
 
     elif sample.distribution_type is Distributions.weibull:
         if len(sample.params) != 2:
-            raise ValueError("Weibull distribution requires two parameters")
+            raise TypeError("Weibull distribution requires two parameters")
         if sample.params[0].param_type is not ParameterTypes.shape:
-            raise ValueError("First parameter must be shape")
+            raise TypeError("First parameter must be shape")
         if sample.params[1].param_type is not ParameterTypes.scale:
-            raise ValueError("Second parameter must be scale")
+            raise TypeError("Second parameter must be scale")
         if sample.params[0].param_val <= 0:
             raise ValueError("Shape must be positive")
         if sample.params[1].param_val <= 0:
             raise ValueError("Scale must be positive")
-
-    else:
-        raise ValueError("Distribution type not recognized")
 
     db[ID] = sample
     ID += 1
@@ -152,8 +147,8 @@ async def get_sample_statistics(id: int):
         mean_dist = sample_def.params[1].param_val \
                     * gamma(1 + 1 / sample_def.params[0].param_val)
         std_dist = sample_def.params[1].param_val \
-                     * np.sqrt(gamma(1 + 2 / sample_def.params[0].param_val)
-                               - np.square(mean_dist))
+                    * np.sqrt(gamma(1 + 2 / sample_def.params[0].param_val)
+                              - np.square(gamma(1 + 1 / sample_def.params[0].param_val)))
 
     else:
         raise ValueError("Distribution type not recognized")
