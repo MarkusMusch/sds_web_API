@@ -40,7 +40,7 @@ async def startup():
         app.db_connection = sqlite3.connect(os.getenv('DATABASE'))
         app.db_connection.row_factory = sqlite3.Row
     except sqlite3.Error as e:
-        raise sqlite3.Error("Failed to establish database connection.") from e
+        raise sqlite3.Error('Failed to establish database connection') from e
 
     # create the table for sample definitions if it does not exist yet
     cursor = None
@@ -59,7 +59,7 @@ async def startup():
         app.db_connection.commit()
     except sqlite3.Error as e:
         app.db_connection.rollback()
-        raise sqlite3.Error("Failed to create database table.") from e
+        raise sqlite3.Error('Failed to create database table') from e
     finally:
         if cursor is not None:
             cursor.close()
@@ -72,7 +72,7 @@ async def shutdown():
     try:
         app.db_connection.close()
     except sqlite3.Error as e:
-        raise sqlite3.Error("Failed to close database connection.") from e
+        raise sqlite3.Error('Failed to close database connection.') from e
 
 
 @app.post('/sample')
@@ -93,59 +93,59 @@ async def generate_sample_entry(sample: Sample):
     # validate the sample
 
     if sample.num_samples <= 1:
-        raise ValueError("Number of samples must be two or greater")
+        raise ValueError('Number of samples must be two or greater')
 
     if sample.distribution_type == Distributions.uniform:
         if len(sample.params) != 2:
-            raise TypeError("Uniform distribution requires exactly two "
-                            "parameters")
+            raise TypeError('Uniform distribution requires exactly two '
+                            'parameters')
         if sample.params[0].param_type is not ParameterTypes.min:
-            raise TypeError("First parameter must be min")
+            raise TypeError('First parameter must be min')
         if sample.params[1].param_type is not ParameterTypes.max:
-            raise TypeError("Second parameter must be max")
+            raise TypeError('Second parameter must be max')
 
     elif sample.distribution_type == Distributions.normal:
         if len(sample.params) != 2:
-            raise TypeError("Normal distribution requires exactly two "
-                            "parameters")
+            raise TypeError('Normal distribution requires exactly two '
+                            'parameters')
         if sample.params[0].param_type is not ParameterTypes.mean:
-            raise TypeError("First parameter must be mean")
+            raise TypeError('First parameter must be mean')
         if sample.params[1].param_type is not ParameterTypes.std:
-            raise TypeError("Second parameter must be std")
+            raise TypeError('Second parameter must be std')
         if sample.params[1].param_val <= 0:
-            raise ValueError("Standard deviation must be positive")
+            raise ValueError('Standard deviation must be positive')
 
     elif sample.distribution_type == Distributions.weibull:
         if len(sample.params) != 2:
-            raise TypeError("Weibull distribution requires exactly two "
-                            + "parameters")
+            raise TypeError('Weibull distribution requires exactly two '
+                            + 'parameters')
         if sample.params[0].param_type is not ParameterTypes.shape:
-            raise TypeError("First parameter must be shape")
+            raise TypeError('First parameter must be shape')
         if sample.params[1].param_type is not ParameterTypes.scale:
-            raise TypeError("Second parameter must be scale")
+            raise TypeError('Second parameter must be scale')
         if sample.params[0].param_val <= 0:
-            raise ValueError("Shape must be positive")
+            raise ValueError('Shape must be positive')
         if sample.params[1].param_val <= 0:
-            raise ValueError("Scale must be positive")
+            raise ValueError('Scale must be positive')
 
     else:
-        raise ValueError("Invalid distribution type")
+        raise ValueError('Invalid distribution type')
 
     try:
         cursor = app.db_connection.cursor()
         try:
-            cursor.execute("INSERT INTO sample_definitions (distribution_type,"
-                           + " param_one, param_two, num_samples) VALUES "
-                           + "(?, ?, ?, ?)",
+            cursor.execute('INSERT INTO sample_definitions (distribution_type,'
+                           + ' param_one, param_two, num_samples) VALUES '
+                           + '(?, ?, ?, ?)',
                            (sample.distribution_type.value,
                             sample.params[0].param_val,
                             sample.params[1].param_val,
                             sample.num_samples))
         except sqlite3.IntegrityError as e:
-            if "UNIQUE constraint failed" in str(e):
-                cursor.execute("SELECT id FROM sample_definitions WHERE "
-                               + "distribution_type = ? AND param_one = ? "
-                               + "AND param_two = ? AND num_samples = ?",
+            if 'UNIQUE constraint failed' in str(e):
+                cursor.execute('SELECT id FROM sample_definitions WHERE '
+                               + 'distribution_type = ? AND param_one = ? '
+                               + 'AND param_two = ? AND num_samples = ?',
                                (sample.distribution_type.value,
                                 sample.params[0].param_val,
                                 sample.params[1].param_val,
@@ -153,13 +153,13 @@ async def generate_sample_entry(sample: Sample):
                 return {'ID': cursor.fetchone()[0]}
             else:
                 app.db_connection.rollback()
-                raise sqlite3.IntegrityError("Failed to insert sample into "
-                                             + "database") from e
+                raise sqlite3.IntegrityError('Failed to insert sample into '
+                                             + 'database') from e
         ID = cursor.lastrowid
         app.db_connection.commit()
     except sqlite3.Error as e:
         app.db_connection.rollback()
-        raise sqlite3.Error("Failed to insert sample into database.") from e
+        raise sqlite3.Error('Failed to insert sample into database.') from e
     finally:
         cursor.close()
 
@@ -178,11 +178,11 @@ async def get_samples():
 
     try:
         cursor = app.db_connection.cursor()
-        cursor.execute("SELECT * FROM sample_definitions")
+        cursor.execute('SELECT * FROM sample_definitions')
         rows = cursor.fetchall()
         cursor.close()
     except sqlite3.Error as e:
-        raise sqlite3.Error("Failed to retrieve samples from database.") from e
+        raise sqlite3.Error('Failed to retrieve samples from database.') from e
 
     return rows
 
@@ -206,14 +206,14 @@ async def get_sample_statistics(id: int):
 
     try:
         cursor = app.db_connection.cursor()
-        cursor.execute("SELECT * FROM sample_definitions WHERE id = ?", (id,))
+        cursor.execute('SELECT * FROM sample_definitions WHERE id = ?', (id,))
         sample_def = cursor.fetchone()
         cursor.close()
     except sqlite3.Error as e:
-        raise sqlite3.Error("Failed to retrieve samples from database.") from e
+        raise sqlite3.Error('Failed to retrieve samples from database.') from e
 
     if sample_def is None:
-        raise ValueError("No sample with ID {} exists".format(id))
+        raise ValueError('No sample with ID {} exists'.format(id))
 
     mean_dist = None
     std_dist = None
@@ -247,7 +247,7 @@ async def get_sample_statistics(id: int):
                       - np.square(gamma(1 + 1 / sample_def['param_one'])))
 
     else:
-        raise ValueError("Distribution type not recognized")
+        raise ValueError('Distribution type not recognized')
 
     mean = np.mean(sample)
     std = np.std(sample, ddof=1)

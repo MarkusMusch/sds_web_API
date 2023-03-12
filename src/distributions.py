@@ -37,9 +37,9 @@ class Distributions(Enum):
         Weibull distribution
     """
 
-    uniform = "uniform"
-    normal = "normal"
-    weibull = "weibull"
+    uniform = 'uniform'
+    normal = 'normal'
+    weibull = 'weibull'
 
 
 class ParameterTypes(Enum):
@@ -61,12 +61,12 @@ class ParameterTypes(Enum):
         Scale parameter for e.g. a weibull distribution
     """
 
-    min = "min"
-    max = "max"
-    mean = "mean"
-    std = "std"
-    shape = "shape"
-    scale = "scale"
+    min = 'min'
+    max = 'max'
+    mean = 'mean'
+    std = 'std'
+    shape = 'shape'
+    scale = 'scale'
 
 
 class Parameter(BaseModel):

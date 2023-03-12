@@ -24,11 +24,11 @@ def mock_sample_def():
     """Mock sample definition for testing"""
 
     return {
-        "id": 1,
-        "distribution_type": "uniform",
-        "param_one": 0,
-        "param_two": 1,
-        "num_samples": 100
+        'id': 1,
+        'distribution_type': 'uniform',
+        'param_one': 0,
+        'param_two': 1,
+        'num_samples': 100
     }
 
 
@@ -70,4 +70,4 @@ def test_get_stats_invalid_id():
 
     with TestClient(app) as client:
         with pytest.raises(ValueError):
-            client.get("/sample/-1/statistics")
+            client.get('/sample/-1/statistics')

@@ -1,5 +1,4 @@
 import os
-import tempfile
 
 import pytest
 from unittest.mock import MagicMock
@@ -9,7 +8,7 @@ from unittest.mock import MagicMock
 def setup_db_path():
     """Set the database path to a temporary file"""
 
-    os.environ["DATABASE"] = './database/distributions.db'
+    os.environ['DATABASE'] = './database/distributions.db'
 
     yield
 

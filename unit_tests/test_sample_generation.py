@@ -39,16 +39,16 @@ def test_generate_uniform_sample(mock_db_setup):
     mock_db_connection, mock_execute = mock_db_setup
 
     sample = {
-            "distribution_type": "uniform",
-            "num_samples": 100,
-            "params": [
+            'distribution_type': 'uniform',
+            'num_samples': 100,
+            'params': [
                 {
-                    "param_type": "min",
-                    "param_val": 0.0
+                    'param_type': 'min',
+                    'param_val': 0.0
                 },
                 {
-                    "param_type": "max",
-                    "param_val": 1.0
+                    'param_type': 'max',
+                    'param_val': 1.0
                 }
             ]
             }
@@ -64,8 +64,8 @@ def test_generate_uniform_sample(mock_db_setup):
             assert {'ID': 1} == response.json()
 
             mock_execute.assert_called_once_with(
-                "INSERT INTO sample_definitions (distribution_type, "
-                + "param_one, param_two, num_samples) VALUES (?, ?, ?, ?)",
+                'INSERT INTO sample_definitions (distribution_type, '
+                + 'param_one, param_two, num_samples) VALUES (?, ?, ?, ?)',
                 (sample['distribution_type'], sample['params'][0]['param_val'],
                  sample['params'][1]['param_val'], sample['num_samples'])
             )
@@ -78,16 +78,16 @@ def test_generate_normal_sample(mock_db_setup):
     mock_db_connection, mock_execute = mock_db_setup
 
     sample = {
-            "distribution_type": "normal",
-            "num_samples": 100,
-            "params": [
+            'distribution_type': 'normal',
+            'num_samples': 100,
+            'params': [
                 {
-                    "param_type": "mean",
-                    "param_val": 0.0
+                    'param_type': 'mean',
+                    'param_val': 0.0
                 },
                 {
-                    "param_type": "std",
-                    "param_val": 1.0
+                    'param_type': 'std',
+                    'param_val': 1.0
                 }
             ]
             }
@@ -103,8 +103,8 @@ def test_generate_normal_sample(mock_db_setup):
             assert {'ID': 1} == response.json()
 
             mock_execute.assert_called_once_with(
-                "INSERT INTO sample_definitions (distribution_type, "
-                + "param_one, param_two, num_samples) VALUES (?, ?, ?, ?)",
+                'INSERT INTO sample_definitions (distribution_type, '
+                + 'param_one, param_two, num_samples) VALUES (?, ?, ?, ?)',
                 (sample['distribution_type'], sample['params'][0]['param_val'],
                  sample['params'][1]['param_val'], sample['num_samples'])
             )
@@ -117,16 +117,16 @@ def test_generate_weibull_sample(mock_db_setup):
     mock_db_connection, mock_execute = mock_db_setup
 
     sample = {
-            "distribution_type": "weibull",
-            "num_samples": 100,
-            "params": [
+            'distribution_type': 'weibull',
+            'num_samples': 100,
+            'params': [
                 {
-                    "param_type": "shape",
-                    "param_val": 1.0
+                    'param_type': 'shape',
+                    'param_val': 1.0
                 },
                 {
-                    "param_type": "scale",
-                    "param_val": 1.0
+                    'param_type': 'scale',
+                    'param_val': 1.0
                 }
             ]
             }
@@ -142,8 +142,8 @@ def test_generate_weibull_sample(mock_db_setup):
             assert {'ID': 1} == response.json()
 
             mock_execute.assert_called_once_with(
-                "INSERT INTO sample_definitions (distribution_type, param_one,"
-                + " param_two, num_samples) VALUES (?, ?, ?, ?)",
+                'INSERT INTO sample_definitions (distribution_type, param_one,'
+                + ' param_two, num_samples) VALUES (?, ?, ?, ?)',
                 (sample['distribution_type'], sample['params'][0]['param_val'],
                  sample['params'][1]['param_val'], sample['num_samples'])
             )
@@ -156,20 +156,20 @@ def test_generate_uniform_num_args_error(mock_db_setup):
     mock_db_connection, mock_execute = mock_db_setup
 
     sample = {
-                "distribution_type": "uniform",
-                "num_samples": 100,
-                "params": [
+                'distribution_type': 'uniform',
+                'num_samples': 100,
+                'params': [
                     {
-                        "param_type": "min",
-                        "param_val": 0
+                        'param_type': 'min',
+                        'param_val': 0
                     },
                     {
-                        "param_type": "max",
-                        "param_val": 1
+                        'param_type': 'max',
+                        'param_val': 1
                     },
                     {
-                        "param_type": "max",
-                        "param_val": 1
+                        'param_type': 'max',
+                        'param_val': 1
                     }
                 ]
              }
@@ -177,7 +177,7 @@ def test_generate_uniform_num_args_error(mock_db_setup):
     with TestClient(app) as client:
         with patch('src.endpoints.app.db_connection', new=mock_db_connection):
             with pytest.raises(TypeError):
-                client.post("/sample", json=sample)
+                client.post('/sample', json=sample)
 
 
 def test_generate_uniform_param_type_error(mock_db_setup):
@@ -187,16 +187,16 @@ def test_generate_uniform_param_type_error(mock_db_setup):
     mock_db_connection, mock_execute = mock_db_setup
 
     sample = {
-                "distribution_type": "uniform",
-                "num_samples": 100,
-                "params": [
+                'distribution_type': 'uniform',
+                'num_samples': 100,
+                'params': [
                     {
-                        "param_type": "shape",
-                        "param_val": 1
+                        'param_type': 'shape',
+                        'param_val': 1
                     },
                     {
-                        "param_type": "max",
-                        "param_val": 1
+                        'param_type': 'max',
+                        'param_val': 1
                     }
                 ]
              }
@@ -204,7 +204,7 @@ def test_generate_uniform_param_type_error(mock_db_setup):
     with TestClient(app) as client:
         with patch('src.endpoints.app.db_connection', new=mock_db_connection):
             with pytest.raises(TypeError):
-                client.post("/sample", json=sample)
+                client.post('/sample', json=sample)
 
 
 def test_generate_normal_value_error(mock_db_setup):
@@ -214,16 +214,16 @@ def test_generate_normal_value_error(mock_db_setup):
     mock_db_connection, mock_execute = mock_db_setup
 
     sample = {
-            "distribution_type": "normal",
-            "num_samples": 100,
-            "params": [
+            'distribution_type': 'normal',
+            'num_samples': 100,
+            'params': [
                 {
-                    "param_type": "mean",
-                    "param_val": 0
+                    'param_type': 'mean',
+                    'param_val': 0
                 },
                 {
-                    "param_type": "std",
-                    "param_val": -1
+                    'param_type': 'std',
+                    'param_val': -1
                 }
             ]
             }
@@ -231,7 +231,7 @@ def test_generate_normal_value_error(mock_db_setup):
     with TestClient(app) as client:
         with patch('src.endpoints.app.db_connection', new=mock_db_connection):
             with pytest.raises(ValueError):
-                client.post("/sample", json=sample)
+                client.post('/sample', json=sample)
 
 
 def test_generate_unkown_distribution_error(mock_db_setup):
@@ -242,17 +242,17 @@ def test_generate_unkown_distribution_error(mock_db_setup):
 
     with TestClient(app) as client:
         with patch('src.endpoints.app.db_connection', new=mock_db_connection):
-            response = client.post("/sample", json={
-                "distribution_type": "exponential",
-                "num_samples": 100,
-                "params": [
+            response = client.post('/sample', json={
+                'distribution_type': 'exponential',
+                'num_samples': 100,
+                'params': [
                     {
-                        "param_type": "mean",
-                        "param_val": 0
+                        'param_type': 'mean',
+                        'param_val': 0
                     },
                     {
-                        "param_type": "std",
-                        "param_val": 1
+                        'param_type': 'std',
+                        'param_val': 1
                     }
                 ]
             })

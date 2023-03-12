@@ -15,5 +15,5 @@ def test_get_samples():
     """Test the get_samples function"""
 
     with TestClient(app) as client:
-        response = client.get("/samples")
+        response = client.get('/samples')
         assert response.status_code == 200
