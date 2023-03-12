@@ -16,6 +16,7 @@ Functions
         Get the statistics for a single sample from the database
 """
 
+import os
 import sqlite3
 
 from fastapi import FastAPI
@@ -36,7 +37,7 @@ async def startup():
     # establish a connection with the database
     app.db_connection = None
     try:
-        app.db_connection = sqlite3.connect('database/distributions.db')
+        app.db_connection = sqlite3.connect(os.getenv('DATABASE'))
         app.db_connection.row_factory = sqlite3.Row
     except sqlite3.Error as e:
         raise sqlite3.Error("Failed to establish database connection.") from e

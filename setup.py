@@ -14,10 +14,10 @@ setup(
         'scipy',
         'uvicorn'
     ],
-    python_requires='>=3.7.6',
+    python_requires='>=3.8',
     entry_points={
         'console_scripts': [
-            'statistical-sampler-API-start = statisticalSamplerAPI.main:main'
+            'statistical-sampler-API-start = main:run_sds_API'
         ]
     }
 )
