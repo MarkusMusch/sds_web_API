@@ -136,7 +136,7 @@ async def generate_sample_entry(sample: Sample):
         try:
             cursor.execute("INSERT INTO sample_definitions (distribution_type,"
                            + " param_one, param_two, num_samples) VALUES "
-                           + " (?, ?, ?, ?)",
+                           + "(?, ?, ?, ?)",
                            (sample.distribution_type.value,
                             sample.params[0].param_val,
                             sample.params[1].param_val,
