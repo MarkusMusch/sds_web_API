@@ -18,13 +18,13 @@ Classes
         Represent the statistics for a single distribution sample
 """
 
-from enum import Enum
+from enum import Enum, IntEnum
 from typing import List
 
 from pydantic import BaseModel
 
 
-class Distributions(Enum):
+class Distributions(IntEnum):
     """Enum for the different types of distributions
     
     Attributes
@@ -37,9 +37,9 @@ class Distributions(Enum):
         Weibull distribution
     """
 
-    uniform = "uniform"
-    normal = "normal"
-    weibull = "weibull"
+    uniform = 0
+    normal = 1
+    weibull = 2
 
 
 class ParameterTypes(Enum):
