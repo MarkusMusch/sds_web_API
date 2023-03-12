@@ -1,0 +1,7 @@
+Metadata-Version: 2.1
+Name: statisticalSamplerAPI
+Version: 0.1.0
+Summary: A web API for generating random samples
+Author: Markus Musch
+Requires-Python: >=3.7.6
+License-File: LICENSE

@@ -1,0 +1,2 @@
+[console_scripts]
+statistical-sampler-API-start = statisticalSamplerAPI.main:main
