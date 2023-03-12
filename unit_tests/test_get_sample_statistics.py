@@ -1,3 +1,17 @@
+"""Unit tests for the /sample/{id}/statistics endpoint
+
+This module contains unit tests for the get_sample_statistics function
+
+Functions
+----------
+    mock_sample_def
+        Mock a sample definition for testing
+    test_get_stats
+        Test the get_sample_statistics function with a mocked database call
+    test_get_stats_invalid_id
+        Test the get_sample_statistics function with an invalid distribution id
+"""
+
 import os
 import sys
 
@@ -16,19 +30,19 @@ def mock_sample_def():
 
     return {
         "id": 1,
-        "distribution_type": 0,
+        "distribution_type": "uniform",
         "param_one": 0,
         "param_two": 1,
-        "num_samples": 1
+        "num_samples": 100
     }
 
 
-def test_get_samples(mock_db_setup, mock_sample_def):
+def test_get_stats(mock_db_setup, mock_sample_def):
     """Test the get_samples function with a mocked database call
-    
+
     Parameters
     ----------
-    mock_db_setup : fixture 
+    mock_db_setup : fixture
         Mock database connection
     mock_sample_def : fixture
         Mock sample definition
@@ -50,7 +64,9 @@ def test_get_samples(mock_db_setup, mock_sample_def):
 
             assert mock_sample_def == response.json()[0]
 
-            mock_execute.assert_called_once_with('SELECT * FROM sample_definitions WHERE id = ?', (1,))
+            mock_execute.assert_called_once_with('SELECT * FROM '
+                                                 + 'sample_definitions WHERE'
+                                                 + ' id = ?', (1,))
 
 
 def test_get_stats_invalid_id():
@@ -59,4 +75,4 @@ def test_get_stats_invalid_id():
 
     with TestClient(app) as client:
         with pytest.raises(ValueError):
-            response = client.get(f"/sample/-1/statistics")
+            client.get("/sample/-1/statistics")

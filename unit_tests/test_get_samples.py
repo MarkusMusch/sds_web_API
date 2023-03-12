@@ -1,8 +1,15 @@
+"""Unit tests for the /samples endpoint
+
+Functions
+----------
+    test_get_samples
+        Test the get_samples function
+"""
+
 import os
 import sys
 
 from fastapi.testclient import TestClient
-import pytest
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 

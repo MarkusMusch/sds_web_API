@@ -4,6 +4,10 @@ This module contains the FastAPI app and the endpoints for the API.
 
 Functions
 ----------
+    startup
+        Initialize the database on start up of the app
+    shutdown
+        Close the database connection on shutdown of the app
     generate_sample_entry
         Generate an new entry in the database for a sample
     get_samples
@@ -19,7 +23,8 @@ from fastapi import FastAPI
 import numpy as np
 from scipy.special import gamma
 
-from src.distributions import Distributions, ParameterTypes, Sample, SampleStatistics
+from src.distributions import Distributions, ParameterTypes, Sample, \
+                              SampleStatistics
 
 
 app = FastAPI()
@@ -44,10 +49,11 @@ async def startup():
         cursor.execute("""
            CREATE TABLE IF NOT EXISTS sample_definitions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                distribution_type INTEGER NOT NULL CHECK(distribution_type >= 0 AND distribution_type <= 2),
+                distribution_type TEXT NOT NULL,
                 param_one REAL NOT NULL,
                 param_two REAL NOT NULL,
-                num_samples INTEGER NOT NULL CHECK(num_samples >= 2)
+                num_samples INTEGER NOT NULL CHECK(num_samples >= 2),
+                UNIQUE(distribution_type, param_one, param_two, num_samples)
             )
         """)
         app.db_connection.commit()
@@ -72,12 +78,12 @@ async def shutdown():
 @app.post('/sample')
 async def generate_sample_entry(sample: Sample):
     """Generate an new entry in the database for a sample
-    
+
     Parameters
     ----------
     sample : Sample
         The sample to be added to the database
-        
+
     Returns
     -------
     dict
@@ -89,17 +95,19 @@ async def generate_sample_entry(sample: Sample):
     if sample.num_samples <= 1:
         raise ValueError("Number of samples must be two or greater")
 
-    if sample.distribution_type == Distributions.uniform.value:
+    if sample.distribution_type == Distributions.uniform:
         if len(sample.params) != 2:
-            raise TypeError("Uniform distribution requires exactly two parameters")
+            raise TypeError("Uniform distribution requires exactly two "
+                            "parameters")
         if sample.params[0].param_type is not ParameterTypes.min:
             raise TypeError("First parameter must be min")
         if sample.params[1].param_type is not ParameterTypes.max:
             raise TypeError("Second parameter must be max")
 
-    elif sample.distribution_type == Distributions.normal.value:
+    elif sample.distribution_type == Distributions.normal:
         if len(sample.params) != 2:
-            raise TypeError("Normal distribution requires exactly two parameters")
+            raise TypeError("Normal distribution requires exactly two "
+                            "parameters")
         if sample.params[0].param_type is not ParameterTypes.mean:
             raise TypeError("First parameter must be mean")
         if sample.params[1].param_type is not ParameterTypes.std:
@@ -107,9 +115,10 @@ async def generate_sample_entry(sample: Sample):
         if sample.params[1].param_val <= 0:
             raise ValueError("Standard deviation must be positive")
 
-    elif sample.distribution_type == Distributions.weibull.value:
+    elif sample.distribution_type == Distributions.weibull:
         if len(sample.params) != 2:
-            raise TypeError("Weibull distribution requires exactly two parameters")
+            raise TypeError("Weibull distribution requires exactly two "
+                            + "parameters")
         if sample.params[0].param_type is not ParameterTypes.shape:
             raise TypeError("First parameter must be shape")
         if sample.params[1].param_type is not ParameterTypes.scale:
@@ -124,9 +133,28 @@ async def generate_sample_entry(sample: Sample):
 
     try:
         cursor = app.db_connection.cursor()
-        cursor.execute("INSERT INTO sample_definitions (distribution_type, param_one, param_two, num_samples) VALUES (?, ?, ?, ?)",
-                       (sample.distribution_type.value, sample.params[0].param_val,
-                        sample.params[1].param_val, sample.num_samples))
+        try:
+            cursor.execute("INSERT INTO sample_definitions (distribution_type,"
+                           + " param_one, param_two, num_samples) VALUES "
+                           + " (?, ?, ?, ?)",
+                           (sample.distribution_type.value,
+                            sample.params[0].param_val,
+                            sample.params[1].param_val,
+                            sample.num_samples))
+        except sqlite3.IntegrityError as e:
+            if "UNIQUE constraint failed" in str(e):
+                cursor.execute("SELECT id FROM sample_definitions WHERE "
+                               + "distribution_type = ? AND param_one = ? "
+                               + "AND param_two = ? AND num_samples = ?",
+                               (sample.distribution_type.value,
+                                sample.params[0].param_val,
+                                sample.params[1].param_val,
+                                sample.num_samples))
+                return {'ID', cursor.fetchone()[0]}
+            else:
+                app.db_connection.rollback()
+                raise sqlite3.IntegrityError("Failed to insert sample into "
+                                             + "database") from e
         ID = cursor.lastrowid
         app.db_connection.commit()
     except sqlite3.Error as e:
@@ -141,7 +169,7 @@ async def generate_sample_entry(sample: Sample):
 @app.get('/samples')
 async def get_samples():
     """Get all samples in the database
-    
+
     Returns
     -------
     List[Sample]
@@ -162,12 +190,12 @@ async def get_samples():
 @app.get('/sample/{id}/statistics')
 async def get_sample_statistics(id: int):
     """Get the statistics for a given sample identified by id
-    
+
     Parameters
     ----------
     id : int
         The ID of the requested sample
-    
+
     Returns
     -------
     Sample
@@ -211,12 +239,12 @@ async def get_sample_statistics(id: int):
     elif sample_def['distribution_type'] == Distributions.weibull.value:
         sample = rng.weibull(sample_def['param_one'],
                              (sample_def['num_samples'], 1)) \
-                             * sample_def['param_two']
+            * sample_def['param_two']
         mean_dist = sample_def['param_two'] \
-                    * gamma(1 + 1 / sample_def['param_one'])
+            * gamma(1 + 1 / sample_def['param_one'])
         std_dist = sample_def['param_two'] \
-                    * np.sqrt(gamma(1 + 2 / sample_def['param_one'])
-                              - np.square(gamma(1 + 1 / sample_def['param_one'])))
+            * np.sqrt(gamma(1 + 2 / sample_def['param_one'])
+                      - np.square(gamma(1 + 1 / sample_def['param_one'])))
 
     else:
         raise ValueError("Distribution type not recognized")

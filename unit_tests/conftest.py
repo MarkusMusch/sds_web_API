@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import MagicMock
 
+
 @pytest.fixture
 def mock_db_setup():
     """Mock the database connection"""
