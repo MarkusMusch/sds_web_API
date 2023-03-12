@@ -49,11 +49,11 @@ def test_generate_uniform_sample(mock_db_setup):
             "params": [
                 {
                     "param_type": "min",
-                    "param_val": 0
+                    "param_val": 0.0
                 },
                 {
                     "param_type": "max",
-                    "param_val": 1
+                    "param_val": 1.0
                 }
             ]
             }
@@ -88,11 +88,11 @@ def test_generate_normal_sample(mock_db_setup):
             "params": [
                 {
                     "param_type": "mean",
-                    "param_val": 0
+                    "param_val": 0.0
                 },
                 {
                     "param_type": "std",
-                    "param_val": 1
+                    "param_val": 1.0
                 }
             ]
             }
@@ -127,11 +127,11 @@ def test_generate_weibull_sample(mock_db_setup):
             "params": [
                 {
                     "param_type": "shape",
-                    "param_val": 1
+                    "param_val": 1.0
                 },
                 {
                     "param_type": "scale",
-                    "param_val": 1
+                    "param_val": 1.0
                 }
             ]
             }
