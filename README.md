@@ -1,6 +1,6 @@
-# sds_web_API
+# statisticalSamplerAPI
 
-
+This is a REST API for storing and evaluation statistical sample definitions.
 
 ## Installation
 
