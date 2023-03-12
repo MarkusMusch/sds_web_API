@@ -1,5 +1,17 @@
+import os
+import tempfile
+
 import pytest
 from unittest.mock import MagicMock
+
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_db_path():
+    """Set the database path to a temporary file"""
+
+    os.environ["DATABASE"] = './database/distributions.db'
+
+    yield
 
 
 @pytest.fixture
